@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
+    // ⚠️ IMPORTANT : Remplace 'Maven_3' par le nom exact que tu as donné à ton Maven dans Jenkins (Administrer Jenkins > Tools)
+    tools {
+        maven 'Maven3'
+        jdk 'JDK21'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Récupère le code depuis le SCM configuré dans Jenkins
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
+                dir('projet_jenkins/ICDE848') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn clean compile -B'
+                        } else {
+                            bat 'mvn clean compile -B'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                // On n'oublie pas le dir() ici aussi
+                dir('projet_jenkins/ICDE848') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn test -B'
+                        } else {
+                            bat 'mvn test -B'
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Checkstyle') {
+            steps {
+                // Et le dir() ici également
+                dir('projet_jenkins/ICDE848') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
+                        } else {
+                            bat 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/checkstyle-result.xml'
+                }
+            }
+        }
+    }
+}
