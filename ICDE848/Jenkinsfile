@@ -27,6 +27,15 @@ pipeline {
     // Les outils (Maven/JDK) sont déjà installés sur le système de l'agent.
     // Pas besoin de bloc 'tools' si Maven et Java sont dans le PATH par défaut.
 
+    // Jenkins s'exécute souvent en tant que service Windows (SYSTEM) 
+    // et n'a pas accès aux variables d'environnement de votre compte utilisateur.
+    // Nous définissons donc explicitement les chemins que nous avons trouvés plus tôt :
+    environment {
+        JAVA_HOME  = 'C:\\Zulu\\zulu-21'
+        MAVEN_HOME = 'C:\\tools\\apache-maven-3.9.6'
+        PATH       = "${MAVEN_HOME}\\bin;${JAVA_HOME}\\bin;${env.PATH}"
+    }
+
     // ─────────────────────────────────────────────────
     // PARAMÈTRES (optionnel – pour TP4)
     // ─────────────────────────────────────────────────
