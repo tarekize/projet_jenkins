@@ -120,26 +120,22 @@ pipeline {
 
     post {
         failure {
-            dir('ICDE848') {
-                script {
-                    echo "Le build a échoué. Envoi de l'email d'alerte..."
-                    if (isUnix()) {
-                        sh "python3 send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    } else {
-                        bat "python send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    }
+            script {
+                echo "Le build a échoué. Envoi de l'email d'alerte..."
+                if (isUnix()) {
+                    sh "python3 ICDE848/send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                } else {
+                    bat "python ICDE848/send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
                 }
             }
         }
         fixed {
-            dir('ICDE848') {
-                script {
-                    echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
-                    if (isUnix()) {
-                        sh "python3 send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    } else {
-                        bat "python send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    }
+            script {
+                echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
+                if (isUnix()) {
+                    sh "python3 ICDE848/send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                } else {
+                    bat "python ICDE848/send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
                 }
             }
         }
