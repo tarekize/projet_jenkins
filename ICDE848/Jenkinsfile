@@ -25,9 +25,12 @@ pipeline {
     agent any
 
     // Outils configurés dans Global Tool Configuration
+    // Assurez-vous que ces noms correspondent EXACTEMENT aux noms définis 
+    // dans "Manage Jenkins" -> "Global Tool Configuration".
+    // Si vous ne savez pas, remplacez par les noms configurés sur votre serveur.
     tools {
-        maven 'Maven3'    // Nom exact défini dans Jenkins
-        jdk   'JDK17'     // Nom exact défini dans Jenkins
+        maven 'Maven3.9'  // Nom exact défini dans "Global Tool Configuration"
+        jdk   'Java21'    // Nom exact défini dans "Global Tool Configuration"
     }
 
     // ─────────────────────────────────────────────────
