@@ -5,7 +5,7 @@ pipeline {
     // ⚠️ IMPORTANT : Remplace 'Maven_3' par le nom exact que tu as donné à ton Maven dans Jenkins (Administrer Jenkins > Tools)
     tools {
         maven 'Maven3'
-        jdk 'JDK21'
+        jdk 'JDK243'
     }
 
     stages {
@@ -67,6 +67,34 @@ pipeline {
             post {
                 always {
                     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/checkstyle-result.xml'
+                }
+            }
+        }
+    }
+
+    // 3. AJOUT : Section post() globale pour envoyer les mails
+    post {
+        failure {
+            dir('ICDE848') {
+                script {
+                    echo "Le build a échoué. Envoi de l'email d'alerte..."
+                    if (isUnix()) {
+                        sh "python3 send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    } else {
+                        bat "python send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    }
+                }
+            }
+        }
+        fixed {
+            dir('ICDE848') {
+                script {
+                    echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
+                    if (isUnix()) {
+                        sh "python3 send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    } else {
+                        bat "python send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    }
                 }
             }
         }
