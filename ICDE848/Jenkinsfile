@@ -4,8 +4,8 @@ pipeline {
     // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
     // ⚠️ IMPORTANT : Remplace 'Maven_3' par le nom exact que tu as donné à ton Maven dans Jenkins (Administrer Jenkins > Tools)
     tools {
-        maven 'Maven3'
-        jdk 'JDK243'
+        maven 'Maven_3'
+        jdk 'JDK_21'
     }
 
     stages {
@@ -19,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
-                dir('ICDE848') {
+                dir('projet_jenkins/ICDE848') {
                     script {
                         if (isUnix()) {
                             sh 'mvn clean compile -B'
@@ -34,7 +34,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 // On n'oublie pas le dir() ici aussi
-                dir('ICDE848') {
+                dir('projet_jenkins/ICDE848') {
                     script {
                         if (isUnix()) {
                             sh 'mvn test -B'
@@ -51,10 +51,56 @@ pipeline {
             }
         }
 
+        stage('Jacoco') {
+            steps {
+                // Analyse de la couverture de code avec Jacoco
+                dir('projet_jenkins/ICDE848') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn verify -B -DskipTests'
+                        } else {
+                            bat 'mvn verify -B -DskipTests'
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    // Publie le rapport de couverture Jacoco
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java'
+                    )
+                }
+            }
+        }
+
+        stage('SpotBugs') {
+            steps {
+                // Analyse des bugs avec SpotBugs
+                dir('projet_jenkins/ICDE848') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn spotbugs:check -B'
+                        } else {
+                            bat 'mvn spotbugs:check -B'
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    // Affiche les résultats SpotBugs dans Jenkins
+                    recordIssues(tools: [spotBugs(pattern: '**/spotbugsXml.xml')])
+                }
+            }
+        }
+
         stage('Checkstyle') {
             steps {
                 // Et le dir() ici également
-                dir('ICDE848') {
+                dir('projet_jenkins/ICDE848') {
                     script {
                         if (isUnix()) {
                             sh 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
@@ -72,31 +118,20 @@ pipeline {
         }
     }
 
-    // 3. AJOUT : Section post() globale pour envoyer les mails
     post {
         failure {
-            dir('ICDE848') {
-                script {
-                    echo "Le build a échoué. Envoi de l'email d'alerte..."
-                    if (isUnix()) {
-                        sh "python3 send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    } else {
-                        bat "python send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    }
-                }
-            }
+            mail(
+                to: 'chel65520@gmail.com',
+                subject: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: "Le build a échoué. Vérifie la console ici : ${env.BUILD_URL}"
+            )
         }
         fixed {
-            dir('ICDE848') {
-                script {
-                    echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
-                    if (isUnix()) {
-                        sh "python3 send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    } else {
-                        bat "python send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
-                    }
-                }
-            }
+            mail(
+                to: 'chel65520@gmail.com',
+                subject: "Build Restored: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body: 'Le build est de nouveau stable (SUCCESS).'
+            )
         }
     }
 }
