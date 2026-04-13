@@ -24,14 +24,8 @@ pipeline {
     // Exécuter sur n'importe quel agent disponible
     agent any
 
-    // Outils configurés dans Global Tool Configuration
-    // Assurez-vous que ces noms correspondent EXACTEMENT aux noms définis 
-    // dans "Manage Jenkins" -> "Global Tool Configuration".
-    // Si vous ne savez pas, remplacez par les noms configurés sur votre serveur.
-    tools {
-        maven 'Maven3.9'  // Nom exact défini dans "Global Tool Configuration"
-        jdk   'Java21'    // Nom exact défini dans "Global Tool Configuration"
-    }
+    // Les outils (Maven/JDK) sont déjà installés sur le système de l'agent.
+    // Pas besoin de bloc 'tools' si Maven et Java sont dans le PATH par défaut.
 
     // ─────────────────────────────────────────────────
     // PARAMÈTRES (optionnel – pour TP4)
