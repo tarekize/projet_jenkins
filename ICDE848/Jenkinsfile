@@ -1,3 +1,5 @@
+
+'''
 pipeline {
     agent any
 
@@ -20,6 +22,9 @@ pipeline {
             steps {
                 // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
                 dir('ICDE848') {
+                    // ---> SIMULATION D'ERREUR ICI <---
+                    error("Simulation volontaire d'une erreur pour tester l'envoi d'email !")
+                    
                     script {
                         if (isUnix()) {
                             sh 'mvn clean compile -B'
@@ -141,3 +146,4 @@ pipeline {
         }
     }
 }
+'''
