@@ -4,9 +4,9 @@ from email.mime.text import MIMEText
 
 def envoyer_email(statut, build_url, job_name):
     # --- CONFIGURATION (À MODIFIER PAR L'UTILISATEUR) ---
-    expediteur = "testemail272002@gmail.com"
-    mot_de_passe = "epsi2026"
-    destinataire = "testemail272002@gmail.com"
+    expediteur = "chel65520@gmail.com"
+    mot_de_passe = "vgoh snjg nnmd qgxb"
+    destinataire = "chel65520@gmail.com"
     # ----------------------------------------------------
 
     sujet = f"Jenkins Build {statut.upper()} - {job_name}"
