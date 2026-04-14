@@ -104,7 +104,7 @@ Warnings NG – SpotBugs       : **/spotbugsXml.xml
 
 ---
 
-## 📚 Ressources test
+## 📚 Ressources validation
 
 - [Jenkins.io](https://jenkins.io) – Documentation officielle
 - [JUnit 5](https://junit.org/junit5/) – Documentation JUnit
