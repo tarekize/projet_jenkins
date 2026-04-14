@@ -5,7 +5,7 @@ pipeline {
     // ⚠️ IMPORTANT : Remplace 'Maven_3' par le nom exact que tu as donné à ton Maven dans Jenkins (Administrer Jenkins > Tools)
     tools {
         maven 'Maven3'
-        jdk 'JDK21'
+        jdk 'JDK233'
     }
 
     stages {
